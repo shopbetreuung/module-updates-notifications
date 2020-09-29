@@ -140,7 +140,7 @@ class fs_module_updates_notifications extends StdModule
         $remoteModuleLoader = RemoteModuleLoader::getModuleLoader();
         $moduleArray = [];
         foreach($remoteModuleLoader->loadAllLatestVersions() as $module) {
-            $moduleArray[] = xtc_db_input($module->getArchiveName());
+            $moduleArray[] = xtc_db_input($module->getName());
         }
         $this->addConfiguration('EMAIL_ADDRESS', '', 6, 1);
         $this->addConfiguration('AVAILABLE_MODULES', serialize($moduleArray), 6, 2);
