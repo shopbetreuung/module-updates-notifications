@@ -1,0 +1,3 @@
+- Nach Installation tragen Sie unter Module - Systemmodule in dieses Modul Ihre E-Mail Adresse ein und wählen, ob Sie informiert werden wollen, wenn für installierte Module ein Update vorliegt, und ob Sie informiert werden wollen, wenn neue Module erscheinen.
+- Sie können hier auch auswählen, ob das Modul täglich, wöchentlich oder monatlich prüfen soll, ob etwas vorliegt.
+- Nach Eingabe der E-Mail Adresse und Klick auf speichern, erhalten Sie eine E-Mail mit einem Bestätigungslink, den Sie anklicken müssen, damit das Modul aktiv wird. Hierfür müssen Sie in Ihrem MMLC eingeloggt sein.
