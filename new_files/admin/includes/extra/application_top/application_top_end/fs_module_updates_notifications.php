@@ -16,7 +16,7 @@ $customersSubscriptionsResult = xtc_db_fetch_array($customersSubscriptionsQuery)
 $notifyUpdate = $customersSubscriptionsResult['subscribed_for_module_updates'] == '1' ? true : false;
 $notifyNewModule = $customersSubscriptionsResult['subscribed_for_new_modules'] == '1' ? true : false;
 
-$lastCheck = MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_LAST_CHECK ? strtotime(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_LAST_CHECK) : strtotime('-10 days');
+$lastCheck = MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_LAST_CHECK != '' ? strtotime(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_LAST_CHECK) : strtotime('-10 days');
 
 switch (MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_CHECK_FOR_UPDATES) {
   case 0:
