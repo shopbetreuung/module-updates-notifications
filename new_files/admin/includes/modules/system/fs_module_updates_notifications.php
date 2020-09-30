@@ -24,68 +24,86 @@ class fs_module_updates_notifications extends StdModule
         return ['MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_STATUS', 'MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS', 'MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_CHECK_FOR_UPDATES'];
     }
 
+    private function sendConfirmationMail($type, $customersId, $emailAddress)
+    {
+        global $messageStack;
+
+        switch ($type) {
+            case 'updates':
+                $select_field = 'subscribed_for_new_modules';
+                $update_field = 'subscribed_for_module_updates';
+                $action = 'activate_subscription_for_updates';
+                $text_subject_subscription_to = TEXT_SUBSCRIPTION_TO_MODULE_UPDATES_SUBJECT;
+            break;
+            case 'new_modules':
+                $select_field = 'subscribed_for_module_updates';
+                $update_field = 'subscribed_for_new_modules';
+                $action = 'activate_subscription_for_new_modules';
+                $text_subject_subscription_to = TEXT_SUBSCRIPTION_TO_NEW_MODULES_SUBJECT;
+            break;
+            default:
+                $select_field = '';
+                $action = 'activate_subscription_all';
+                $text_subject_subscription_to = TEXT_SUBSCRIPTION_TO_ALL_SUBJECT;
+            break;
+        }
+
+        $code = substr(md5(uniqid(mt_rand(), true)) , 0, 16);
+        $link = xtc_href_link_admin('admin/fs_module_updates_notifications.php', 'action=' . $action . '&code='.$code);
+        
+        if ($select_field != '') {
+            $customerSubscribeStatusQuery = xtc_db_query("SELECT " . $select_field . " FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . $customersId);
+            $customerSubscribeStatusResult = xtc_db_fetch_array($customerSubscribeStatusQuery);
+            if ($customerSubscribeStatusResult[$select_field] == '1') {
+                xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET " . $update_field . " = 1 WHERE customers_id = " . $customersId);
+                $messageStack->add_session(TEXT_SUBSCRIBED_FOR_UPDATES, 'success');
+                xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications&action=edit'));
+            }
+
+            xtc_php_mail($emailAddress,
+                         $emailAddress,
+                         $emailAddress,
+                         $emailAddress,
+                         '',
+                         $emailAddress,
+                         $emailAddress,
+                         '',
+                         '',
+                         $text_subject_subscription_to,
+                         sprintf(TEXT_SUBSCRIPTION_BODY, $link, $link),
+                         sprintf(TEXT_SUBSCRIPTION_BODY, $link, $link)
+                         );
+            xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET " . $update_field . " = '" . $code . "' WHERE customers_id = " . $customersId);
+            $messageStack->add_session(sprintf(TEXT_SUBSCRIBED, $emailAddress), 'success');
+            xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications'));
+        } else {
+            xtc_php_mail($emailAddress,
+                         $emailAddress,
+                         $emailAddress,
+                         $emailAddress,
+                         '',
+                         $emailAddress,
+                         $emailAddress,
+                         '',
+                         '',
+                         $text_subject_subscription_to,
+                         sprintf(TEXT_SUBSCRIPTION_BODY, $link, $link),
+                         sprintf(TEXT_SUBSCRIPTION_BODY, $link, $link)
+                         );
+            xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_new_modules = '" . $code . "', subscribed_for_module_updates = '" . $code . "'  WHERE customers_id = " . $customersId);
+            $messageStack->add_session(sprintf(TEXT_SUBSCRIBED, $emailAddress), 'success');
+            xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications'));
+        }
+    }
+
     public function process($file) 
     {
         global $messageStack;
         $customersId = $_SESSION['customer_id'] ? $_SESSION['customer_id'] : 0;
+
+        if ($customersId <= 0) return;
+
         $emailAddress = $_POST['configuration']['MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS'];
-
-        if (isset($_POST['subscribe_new_modules']) && $customersId > 0 && xtc_validate_email($emailAddress)) {
-            $customerSubscribeStatusQuery = xtc_db_query("SELECT subscribed_for_module_updates FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . $customersId);
-            $customerSubscribeStatusResult = xtc_db_fetch_array($customerSubscribeStatusQuery);
-            if ($customerSubscribeStatusResult['subscribed_for_module_updates'] == '1') {
-                xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_new_modules = 1 WHERE customers_id = " . $customersId);
-                $messageStack->add_session(TEXT_SUBSCRIBED_FOR_UPDATES, 'success');
-                xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications&action=edit'));
-            }
-            $code = substr(md5(uniqid(mt_rand(), true)) , 0, 16);
-            $messageStack->add_session(sprintf(TEXT_SUBSCRIBED, $emailAddress), 'success');
-            $link = xtc_href_link_admin('admin/fs_module_updates_notifications.php', 'action=activate_subscription_for_new_modules&code='.$code);
-            xtc_php_mail($emailAddress,
-                         $emailAddress,
-                         $emailAddress,
-                         $emailAddress,
-                         '',
-                         $emailAddress,
-                         $emailAddress,
-                         '',
-                         '',
-                         TEXT_SUBSCRIPTION_TO_NEW_MODULES_SUBJECT,
-                         sprintf(TEXT_SUBSCRIPTION_TO_NEW_MODULES_BODY, $link, $link),
-                         sprintf(TEXT_SUBSCRIPTION_TO_NEW_MODULES_BODY, $link, $link)
-                         );
-            xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_new_modules = '" . $code . "' WHERE customers_id = " . $customersId);
-            xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications'));
-        }
-
-        if (isset($_POST['subscribe_module_updates']) && $customersId > 0 && xtc_validate_email($emailAddress)) {
-            $customerSubscribeStatusQuery = xtc_db_query("SELECT subscribed_for_new_modules FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . $customersId);
-            $customerSubscribeStatusResult = xtc_db_fetch_array($customerSubscribeStatusQuery);
-            if ($customerSubscribeStatusResult['subscribed_for_new_modules'] == '1') {
-                xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_module_updates = 1 WHERE customers_id = " . $customersId);
-                $messageStack->add_session(TEXT_SUBSCRIBED_FOR_UPDATES, 'success');
-                xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications&action=edit'));
-            }
-            $code = substr(md5(uniqid(mt_rand(), true)) , 0, 16);
-            $messageStack->add_session(sprintf(TEXT_SUBSCRIBED, $emailAddress), 'success');
-            $link = xtc_href_link_admin('admin/fs_module_updates_notifications.php', 'action=activate_subscription_for_updates&code='.$code);
-         
-            xtc_php_mail($emailAddress,
-                         $emailAddress,
-                         $emailAddress,
-                         $emailAddress,
-                         '',
-                         $emailAddress,
-                         $emailAddress,
-                         '',
-                         '',
-                         TEXT_SUBSCRIPTION_TO_MODULE_UPDATES_SUBJECT,
-                         sprintf(TEXT_SUBSCRIPTION_TO_MODULE_UPDATES_BODY, $link, $link),
-                         sprintf(TEXT_SUBSCRIPTION_TO_MODULE_UPDATES_BODY, $link, $link)
-                         );
-            xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_module_updates = '" . $code . "' WHERE customers_id = " . $customersId);
-            xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications'));
-        }
 
         if (!isset($emailAddress) || !xtc_validate_email($emailAddress)) {
             if (trim($emailAddress) == '') {
@@ -93,12 +111,29 @@ class fs_module_updates_notifications extends StdModule
                 xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_module_updates = '0', subscribed_for_new_modules = '0' WHERE customers_id = " . $customersId);
                 xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications'));
             }
-            $messageStack->add_session('Email_not_valid', 'error');
+            $messageStack->add_session(TEXT_ERROR_EMAIL_NOT_VALID, 'error');
             xtc_db_query("UPDATE " . TABLE_CONFIGURATION . " 
                           SET configuration_value = '" . xtc_db_input(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS) . "' 
                           WHERE configuration_key = 'MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS'");
             xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications'));
         }
+
+        if (isset($_POST['is_subscribed_for_new_modules']) 
+            && $_POST['is_subscribed_for_new_modules'] == '1' 
+            && isset($_POST['is_subscribed_for_updates']) 
+            && $_POST['is_subscribed_for_updates'] == '1') 
+        {
+            $this->sendConfirmationMail('all', $customersId, $emailAddress);
+        }
+
+        if (isset($_POST['is_subscribed_for_new_modules']) && $_POST['is_subscribed_for_new_modules'] == '1') {
+            $this->sendConfirmationMail('new_modules', $customersId, $emailAddress);
+        }
+
+        if (isset($_POST['is_subscribed_for_updates']) && $_POST['is_subscribed_for_updates'] == '1') {
+            $this->sendConfirmationMail('updates', $customersId, $emailAddress);
+        }
+
     }
        
     public function display()
@@ -108,7 +143,8 @@ class fs_module_updates_notifications extends StdModule
             $subscribedResult = xtc_db_fetch_array($subscribedQuery);
 
             if ($subscribedResult['subscribed_for_module_updates'] == '0') {
-                $subscribeUpdate = xtc_button(BUTTON_SUBSCRIBE_TO_UPDATES, 'submit', 'name="subscribe_module_updates"') . TEXT_SUBSCRIBE_TO_UPDATES;
+                $subscribeUpdate = xtc_button(BUTTON_SUBSCRIBE_TO_UPDATES, 'button', 'name="subscribe_module_updates"') . '<span id="text_subscribe_updates">' . TEXT_SUBSCRIBE_TO_UPDATES . '</span>';
+                $subscribeUpdate .= xtc_draw_input_field('is_subscribed_for_updates', '0', '', '', 'hidden');
             } else if ($subscribedResult['subscribed_for_module_updates'] == '1') {
                 $subscribeUpdate = TEXT_SUBSCRIBED_TO_UPDATES;
             } else {
@@ -116,7 +152,8 @@ class fs_module_updates_notifications extends StdModule
             }   
 
             if ($subscribedResult['subscribed_for_new_modules'] == '0') {
-                $subscribeNewModule = xtc_button(BUTTON_SUBSCRIBE_TO_NEW_MODULES, 'submit', 'name="subscribe_new_modules"') . TEXT_SUBSCRIBE_TO_NEW_MODULES;
+                $subscribeNewModule = xtc_button(BUTTON_SUBSCRIBE_TO_NEW_MODULES, 'button', 'name="subscribe_new_modules"') . '<span id="text_subscribe_new_modules">' . TEXT_SUBSCRIBE_TO_NEW_MODULES . '</span>';
+                $subscribeUpdate .= xtc_draw_input_field('is_subscribed_for_new_modules', '0', '', '', 'hidden');
             } else if ($subscribedResult['subscribed_for_new_modules'] == '1') {
                 $subscribeNewModule = TEXT_SUBSCRIBED_TO_NEW_MODULES;
             } else {

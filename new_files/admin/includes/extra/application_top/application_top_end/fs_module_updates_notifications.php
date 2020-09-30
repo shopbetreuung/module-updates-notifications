@@ -41,12 +41,16 @@ if (trim($lastCheck) != '' && $cycle < (time() - $lastCheck)) {
 
   foreach($remoteModuleLoader->loadAllLatestVersions() as $module) {
     $moduleArray[] = $module->getName();
+    $moduleLinks[$module->getName()] = xtc_href_link_admin(DIR_WS_CATALOG . 'ModifiedModuleLoaderClient','action=moduleInfo&archiveName='.$module->getArchiveName());
   }
 
   if (MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_AVAILABLE_MODULES) {
     $yesterdaysModuleArray = unserialize(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_AVAILABLE_MODULES);  
     $newModules = array_diff($moduleArray, $yesterdaysModuleArray);
     if ($newModules && $notifyNewModule) {
+      foreach($newModules as $newModule) {
+        $moduleWithLinks[] = '<a href="' . $moduleLinks[$newModule] . '">' . $newModule . '</a>';
+      }
       xtc_php_mail(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
                   MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
                   MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
@@ -57,15 +61,15 @@ if (trim($lastCheck) != '' && $cycle < (time() - $lastCheck)) {
                   '',
                   '',
                   TEXT_NEW_MODULES_AVAILABLE,
-                  sprintf(TEXT_FOLLOWING_MODULES_ARE_AVAILABLE, implode(',', $newModules)),
-                  sprintf(TEXT_FOLLOWING_MODULES_ARE_AVAILABLE, implode(',', $newModules))
+                  sprintf(TEXT_FOLLOWING_MODULES_ARE_AVAILABLE, implode(',', $moduleWithLinks)),
+                  sprintf(TEXT_FOLLOWING_MODULES_ARE_AVAILABLE, implode(',', $moduleWithLinks))
                   );
       xtc_db_query("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = '" . serialize($moduleArray) . "' WHERE configuration_key = 'MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_AVAILABLE_MODULES'");
     }
   } 
   if (sizeof($updatableModules) > 0) {
     foreach($updatableModules as $module) {
-      $modulesToUpdate[] = $module->getName();
+      $modulesToUpdate[] = '<a href="' . $moduleLinks[$module->getName()] . '">' . $module->getName() . '</a>';
     }
     xtc_php_mail(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
                 MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,

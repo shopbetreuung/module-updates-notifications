@@ -9,6 +9,17 @@ $action = $_GET['action'];
 $code = $_GET['code'];
 $customersId = $_SESSION['customer_id'];
 
+if ($action == 'activate_subscription_all') {
+  global $messageStack;
+  $subscription_activated = xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_module_updates = 1, subscribed_for_new_modules = 1 WHERE customers_id = " . $customersId . " AND subscribed_for_module_updates = '" . $code . "'");
+  if ($subscription_activated) {
+    $messageStack->add_session(TEXT_SUBSCRIBED_FOR_UPDATES, 'success');
+  } else {
+    $messageStack->add_session(TEXT_NOT_SUBSCRIBED_FOR_UPDATES, 'error');
+  }
+  xtc_redirect(xtc_href_link_admin('admin/' . FILENAME_MODULE_EXPORT, 'set=system&module=fs_module_updates_notifications&action=edit'));
+}
+
 if ($action == 'activate_subscription_for_updates') {
   global $messageStack;
   $subscription_activated = xtc_db_query("UPDATE " . TABLE_CUSTOMERS . " SET subscribed_for_module_updates = 1 WHERE customers_id = " . $customersId . " AND subscribed_for_module_updates = '" . $code . "'");
