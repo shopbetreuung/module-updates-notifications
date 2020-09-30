@@ -49,7 +49,7 @@ if (trim($lastCheck) != '' && $cycle < (time() - $lastCheck)) {
     $newModules = array_diff($moduleArray, $yesterdaysModuleArray);
     if ($newModules && $notifyNewModule) {
       foreach($newModules as $newModule) {
-        $moduleWithLinks[] = '<a href="' . $moduleLinks[$newModule] . '">' . $newModule . '</a>';
+        $moduleWithLinks[] = '<br/>- <a href="' . $moduleLinks[$newModule] . '">' . $newModule . '</a>';
       }
       xtc_php_mail(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
                   MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
@@ -69,7 +69,7 @@ if (trim($lastCheck) != '' && $cycle < (time() - $lastCheck)) {
   } 
   if (sizeof($updatableModules) > 0) {
     foreach($updatableModules as $module) {
-      $modulesToUpdate[] = '<a href="' . $moduleLinks[$module->getName()] . '">' . $module->getName() . '</a>';
+      $modulesToUpdate[] = '<br/>- <a href="' . $moduleLinks[$module->getName()] . '">' . $module->getName() . '</a>';
     }
     xtc_php_mail(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,
                 MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS,

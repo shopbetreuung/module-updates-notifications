@@ -4,7 +4,7 @@
     "sourceDir": "new_files",
     "version": "auto",
     "productNumber": "",
-    "shortDescription": "Kurzbeschreibung für module-updates-notifications",
+    "shortDescription": "E-Mail Benachrichtigung bei Moduleupdates oder neuen Modulen.",
     "description": "Nach Installation tragen Sie unter Module - Systemmodule in dieses Modul Ihre E-Mail Adresse ein und wählen, ob Sie informiert werden wollen, wenn für installierte Module ein Update vorliegt, und ob Sie informiert werden wollen, wenn neue Module erscheinen. Sie können hier auch auswählen, ob das Modul täglich, wöchentlich oder monatlich prüfen soll, ob etwas vorliegt. <br/>Nach Eingabe der E-Mail Adresse und Klick auf speichern, erhalten Sie eine E-Mail mit einem Bestätigungslink, den Sie anklicken müssen, damit das Modul aktiv wird. Hierfür müssen Sie in Ihrem MMLC eingeloggt sein.",
     "developer": "fishnetservices",
     "developerWebsite": "https://www.shopbetreuung.com/",
