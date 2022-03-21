@@ -1,6 +1,8 @@
 <?php
 if (!defined(MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_STATUS) || MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_STATUS != 'true') return;
-if (pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME) == 'module_export') return;
+if (pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME) == 'module_export'
+    || pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME) == 'modules'
+    || pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME) == 'categories') return;
 use RobinTheHood\ModifiedModuleLoaderClient\DependencyManager;
 use RobinTheHood\ModifiedModuleLoaderClient\ModuleFilter;
 use RobinTheHood\ModifiedModuleLoaderClient\Loader\RemoteModuleLoader;

@@ -1,5 +1,6 @@
 <?php
 define('MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_TITLE', 'Modules notifications © by <a href="https://www.shopbetreuung.com/" target="_blank" style="color: #007BFF; font-size:12px; font-weight: bold;">FishnetServices</a>');
+define('MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_STATUS_DESC', '');
 define('MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_LONG_DESCRIPTION', 'Sends an e-mail when updates or new modules are available');
 define('MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_STATUS_TITLE', 'Modul active?');
 define('MODULE_FS_MODULE_UPDATES_NOTIFICATIONS_EMAIL_ADDRESS_TITLE', 'Your E-Mail');
